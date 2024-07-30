@@ -1,0 +1,149 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+Bolonews
+{% endblock %}
+{% block headerNav %}
+	<li>
+		<a href="">Home</a>
+		<div class="underline"></div>
+	</li>
+	<li>
+		<a href="{{path('app_articles')}}">Articles</a>
+	</li>
+	<li>
+		<a href="#">Contact</a>
+	</li>
+{% endblock %}
+{% block header %}
+	{% if is_granted("ROLE_ADMIN") %}
+		<a class="flex item-center gap5px" href="{{path('app_admin')}}">Mon espace
+			<img src="{{asset('images/blog/user.png')}}" alt=""></a>
+		<a href="{{path('app_logout')}}">Me deconnecter</a>
+	{% elseif is_granted("ROLE_USER") %}
+		<a class="flex item-center gap5px" href="{{path('app_user')}}">Mon espace
+			<img src="{{asset('images/blog/user.png')}}" alt=""></a>
+		<a href="{{path('app_logout')}}">Me deconnecter</a>
+	{% else %}
+		<a href="{{path('app_login')}}">Se connecter</a>
+		<a href="{{path('app_register')}}">M'inscrire</a>
+	{% endif %}
+{% endblock %}
+
+{% block body %}
+	<!-- A la Une  -->
+	<main
+		class="container-1200">
+		<!-- SECTION A LA UNE -->
+		<section class="a-la-une margin-top5 large-12">
+			<h2 class="margin-bottom10px">A la une !</h2>
+			<article class="card flex space-evenly">
+				<div class="card-img large-6 padding-right10px">
+					<div class="img"><img src="{{asset('/imgProduits/' ~ articleOne.Article.picture)}}" alt=""></div>
+				</div>
+				<div class="card-content flex space-between large-6 padding-left10px">
+					<div>
+						<p class="category">{{ articleOne.article.category.label }}</p>
+					</div>
+					<div>
+						<h3>{{ articleOne.article.title }}
+						</h3>
+					</div>
+					<div>
+						<p>{{ articleOne.article.hat }}</p>
+					</div>
+					<div class="flex content-end">
+						<a class="flex item-center gap5px" href="{{ path('app_detail',{id: articleOne.article.id} ) }}">Lire suite
+							<img src="{{asset('images/blog/arrow-right.png')}}" alt="fleche a droite"></a>
+					</div>
+					<div class="flex item-center gap16px">
+						<div>
+							<div class="avatar"></div>
+						</div>
+						<p>{{ articleOne.article.auteur.pseudo }}</p>
+					</div>
+					<div class="flex space-between item-center">
+						<p>{{ articleOne.article.creationDateAt | format_datetime('full','short',locale='fr')}}</p>
+						<div class="flex item-center space-between large-3 gap16px">
+							<div class="flex item-center gap5px"><img src="{{asset('images/blog/message-circle.png')}}" alt="icon d une bulle de message">
+								{% set count = 0 %}
+								<p>
+									{% for comment in articleOne.article.comments %}
+										{% set count = count + 1 %}
+									{% endfor %}
+								</p>
+								<p>{{ count }}</p>
+							</div>
+							{% if is_granted('ROLE_USER') %}
+								<div class="flex item-center gap5px like" data-id={{ articleOne.id }}>
+								{% else %}
+									<div class="flex item-center gap5px like">
+									{% endif %}
+									{% if app.user in articleOne.article.nbLike %}
+										<img src="{{asset('images/blog/heart-1.png')}}" alt="icon d un coeur">
+									{% else %}
+										<img src="{{asset('images/blog/heart.png')}}" alt="icon d un coeur">
+									{% endif %}
+									<p>{{ articleOne.article.nbLike | length }}</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</article>
+			</section>
+			<!-- DENIERE PARUTION -->
+			<section class="derniere-parution large-12 margin-top5">
+				<h2 class="margin-bottom10px">Dernières parution.</h2>
+				<div
+					class=" flex flex-wrap space-beween">
+					<!-- ARTICLE -->
+					{% for article in articles %}
+						<article class="large-6 flex margin-bottom5 padding10px">
+							<div class="padding-right10px large-6">
+								<div class="img"><img src="{{asset('/imgProduits/' ~ article.picture )}}" alt=""></div>
+							</div>
+							<div class="padding-left10px flex direction-column space-between large-6">
+								<div class="category">
+									<p>{{ article.category.label }}</p>
+								</div>
+								<div>
+									<h2 class=" margin-bottom10px">{{ article.title }}</h2>
+									<p class=" ligth-grey">{{ article.auteur }}</p>
+									<p class="text-end ligth-grey margin-bottom10px">{{ article.creationDateAt | format_datetime('full','short',locale='fr')}}</p>
+								</div>
+								<div>
+									<p>{{ article.hat }}</p>
+								</div>
+								<div class="flex content-end">
+									<a class="flex item-center gap5px" href="{{ path('app_detail',{id: article.id} ) }}">Lire suite
+										<img src="{{asset('images/blog/arrow-right.png')}}" alt="fleche a droite"></a>
+								</div>
+								<div class="flex item-center space-between large-5 gap16px">
+									<div class="flex item-center gap5px"><img src="{{asset('images/blog/message-circle.png')}}" alt="icon d une bulle de message">
+										{% set count = 0 %}
+										{% for comment in article.comments %}
+											{% set count = count + 1 %}
+										{% endfor %}
+										<p>{{ count }}</p>
+									</div>
+									{% if is_granted('ROLE_USER') %}
+										<div class="flex item-center gap5px like" data-id={{ article.id }}>
+										{% else %}
+											<div class="flex item-center gap5px like">
+											{% endif %}
+											{% if app.user in article.nbLike %}
+												<img src="{{asset('images/blog/heart-1.png')}}" alt="icon d un coeur">
+											{% else %}
+												<img src="{{asset('images/blog/heart.png')}}" alt="icon d un coeur">
+											{% endif %}
+											<p>{{ article.nbLike | length }}</p>
+										</div>
+									</div>
+								</div>
+							</article>
+						{% endfor %}
+					</div>
+				</section>
+			</main>
+
+		{% endblock %}

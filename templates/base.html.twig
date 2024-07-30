@@ -4,14 +4,52 @@
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <link rel="stylesheet" href="{{asset('css/style.css')}}">
         {% block stylesheets %}
         {% endblock %}
 
         {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
     <body>
+        <!-- HEADER -->
+    <header class="flex space-between item-center width100">
+        <div>
+            <p>BOLONEWS</p>
+        </div>
+        <div>
+            <nav>
+                <ul class="flex content-center item-center gap16px">
+                {% block headerNav %}{% endblock %}
+                </ul>
+            </nav>
+        </div>
+        <div class="flex gap16px item-center">
+        {% block header %}{% endblock %}
+        </div>
+    </header>
+        <!-- Bandeau BOLONEWS -->
+    <div class="bandeau margin-top5">
+        <div>
+            <h2 class="text-center">Bolonews</h2>
+            <h1 class="text-center margin-bottom30px">Les meilleures sauces pour les pâtes et de l’acualité sur le grill</h1>
+        </div>
+        <div class="line margin-top10px">
+        </div>
+        {% block search %}{% endblock %}
+        {% if is_granted("ROLE_ADMIN") %}
+                {% block adminMenu %}{% endblock %}
+        {% endif %}
+    </div>
+    <div class="container-1200">
+    {% block addArticle %}{% endblock %}
+    </div>
+
         {% block body %}{% endblock %}
     </body>
+        <!-- FOOTER -->
+    <footer class=" flex item-center margin-top5">
+        <h2 class="color-white">Bolonews</h2>
+    </footer>
+    <script src="{{asset('js/app.js')}}"></script>
 </html>

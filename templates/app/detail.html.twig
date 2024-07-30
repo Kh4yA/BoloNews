@@ -1,0 +1,108 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Bolonews
+{% endblock %}
+{% block headerNav %}
+	<li>
+		<a href="{{path('app_app')}}">Home</a>
+
+	</li>
+	<li>
+		<a href="#">Articles</a>
+		<div class="underline"></div>
+	</li>
+	<li>
+		<a href="#">Contact</a>
+	</li>
+{% endblock %}
+{% block header %}
+	{% if is_granted("ROLE_ADMIN") %}
+		<a class="flex item-center gap5px" href="{{path('app_admin')}}">Mon espace
+			<img src="{{asset('images/blog/user.png')}}" alt=""></a>
+		<a href="{{path('app_logout')}}">Me deconnecter</a>
+	{% elseif is_granted("ROLE_USER") %}
+		<a class="flex item-center gap5px" href="{{path('app_user')}}">Mon espace
+			<img src="{{asset('images/blog/user.png')}}" alt=""></a>
+		<a href="{{path('app_logout')}}">Me deconnecter</a>
+	{% else %}
+		<a href="{{path('app_login')}}">Se connecter</a>
+		<a href="{{path('app_register')}}">M'inscrire</a>
+	{% endif %}
+{% endblock %}
+
+{% block body %}
+	<article class="detail container-1200 margin-top5">
+		<div class='flex direction-column space-between gap16px margin-bottom5'>
+			<div class="category">{{  article.category.label }}</div>
+			<div>
+				<h2>{{ article.title }}</h2>
+			</div>
+			<div>
+				<p>{{ article.creationDateAt | format_datetime('full','short',locale='fr')}}</p>
+			</div>
+			<div>
+				<p>{{ article.hat | nl2br}}</p>
+			</div>
+			<div class="large-10">
+				<div class='img'><img src="{{asset('imgProduits/' ~ article.picture)}}" alt=""></div>
+			</div>
+			<div>
+				<p>{{ article.content | nl2br}}</p>
+			</div>
+			<div>
+				<div class="flex space-between item-center">
+					<p>{{article.auteur.pseudo}}</p>
+					<div class="flex item-center space-between large-2 gap16px">
+						<div class="flex item-center gap5px"><img src="{{asset('images/blog/message-circle.png')}}" alt="icon d une bulle de message">
+							{% set count = 0 %}
+								{% for comment in article.comments %}
+									{% set count = count + 1 %}
+								{% endfor %}
+							<p>{{ count }}</p>
+						</div>
+								{% if is_granted('ROLE_USER') %}
+								<div class="flex item-center gap5px like" data-id = {{ article.id }}>
+								{% else %}
+								<div class="flex item-center gap5px like">
+								{% endif %}
+							<img src="{{asset('images/blog/heart.png')}}" alt="icon d un coeur">
+										{% if app.user in article.nbLike %}
+											<img src="{{asset('images/blog/heart-1.png')}}" alt="icon d un coeur">
+										{% else %}
+											<img src="{{asset('images/blog/heart.png')}}" alt="icon d un coeur">
+										{% endif %}
+										<p>{{ article.nbLike | length }}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<div class="line margin-bottom5"></div>
+	<section class='comments container-1200 margin-bottom5'>
+		<div>
+			<h4 class=" margin-bottom30px">Commentaires :</h4>
+			{% for comment in article.comments %}
+				<div class="card-comment">
+					<div class="flex space-between margin-bottom30px">
+						<p>{{ comment.auteur.pseudo }}</p>
+						<p>Posté le :
+							{{ comment.publicationDateAt | format_datetime('full','short',locale='fr')}}</p>
+					</div>
+					<div>
+						<p>{{ comment.content }}</p>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</section>
+	<section class="form-comment container-1200">
+		<h4 class=' margin-bottom30px'>Ajouter un commentaire</h4>
+		<form action="{{path('app_detail_comment',{'id': article.id})}}" method="POST">
+			<div>
+				<textarea name="content" id="content" cols="60" rows="10"></textarea>
+			</div>
+			<button type="submit" class=" margin-top10px">Ajouter</button>
+		</form>
+	</section>
+{% endblock %}

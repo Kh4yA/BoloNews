@@ -1,0 +1,232 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bolonews
+{% endblock %}
+{% block headerNav %}
+	<li>
+		<a href="{{path('app_app')}}">Home</a>
+
+	</li>
+	<li>
+		<a href="{{path('app_articles')}}">Articles</a>
+	</li>
+	<li>
+		<a href="#">Contact</a>
+	</li>
+{% endblock %}
+{% block header %}
+	{% if is_granted("ROLE_ADMIN") %}
+		<a class="flex item-center gap5px category" href="{{path('app_admin')}}">Mon espace
+			<img src="{{asset('images/blog/user.png')}}" alt=""></a>
+		<a href="{{path('app_logout')}}">Me deconnecter</a>
+	{% elseif is_granted("ROLE_USER") %}
+		<a class="flex item-center gap5px category" href="{{path('app_app')}}">Mon espace
+			<img src="{{asset('images/blog/user.png')}}" alt="">
+			<a href="{{path('app_logout')}}">Me deconnecter</a>
+		{% else %}
+			<a href="{{path('app_login')}}">Se connecter</a>
+			<a href="{{path('app_register')}}">M'inscrire</a>
+		{% endif %}
+	{% endblock %}
+	{% block search %}
+		<form action="{{path('article_search')}}" method="GET">
+			<div class="search large-4">
+				<label for="search"></label>
+				<input type="text" name="search" id="search" placeholder="Rechercher">
+				<button type="submit"><img src="{{asset('images/blog/search.png')}}" alt=""></button>
+			</div>
+		</form>
+		<div class="line margin-bottom10px"></div>
+		<div class="flex content-center gap5px">
+			{% for category in categories %}
+				<div class="category">{{ category.label }}</div>
+			{% endfor %}
+		</div>
+	{% endblock %}
+	{% block adminMenu %}
+		<div class="admin-menu large-2">
+			<nav>
+				<ul class="flex direction-column space-evenly gap16px">
+					<li>
+						<a href="{{path('app_admin')}}">
+							<span class="color-yellow">Mes articles</span>
+						</a>
+					</li>
+					<li>
+						<a href="{{path('admin_allArticle')}}">
+							<span>Tous les articles</span>
+						</a>
+					</li>
+					<li>
+						<a href="{{path('admin_allUser')}}">Users</a>
+					</li>
+					<li>
+						<a href="{{path('category_add')}}">Categories</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	{% endblock %}
+	{% block addArticle %}
+		<div class='btn-add'>
+			<a href="{{path('article_new')}}">Ajouter un article</a>
+		</div>
+	{% endblock %}
+
+	{% block body %}
+		<!-- A la Une  -->
+		<main
+			class="container-1200">
+			<!-- ARTICLE PUBLIÉ -->
+			<section class="article-user large-12 margin-top5">
+				<h2 class="margin-bottom10px">Mes articles publiés</h2>
+				<div
+					class=" flex flex-wrap space-beween">
+					<!-- ARTICLE -->
+					{% if articlesPublish != null %}
+						{% for article in articlesPublish %}
+							<article class="large-6 flex margin-bottom5 padding10px">
+								<div class="padding-right10px large-6">
+									<div class="img"><img src="{{asset('/imgProduits/' ~ article.picture )}}" alt=""></div>
+								</div>
+								<div class="padding-left10px flex direction-column space-between large-6">
+									<div class="flex space-between">
+										<div class="category">
+											<p>{{ article.category.label }}</p>
+										</div>
+									</div>
+									<div>
+										<h2 class=" margin-bottom10px">{{ article.title }}</h2>
+										<p class=" ligth-grey">{{ article.auteur }}</p>
+										<p class="text-end ligth-grey margin-bottom10px">{{ article.creationDateAt | format_datetime('full','short',locale='fr')}}</p>
+									</div>
+									<div>
+										<p>{{ article.hat }}</p>
+									</div>
+									<div class="flex content-end">
+										<a class="flex item-center gap5px" href="{{path('app_detail',{id: article.id})}}">Lire suite
+											<img src="{{asset('images/blog/arrow-right.png')}}" alt="fleche a droite"></a>
+									</div>
+									<div class="flex item-center space-between large-5 gap16px">
+										<div class="flex item-center gap5px"><img src="{{asset('images/blog/message-circle.png')}}" alt="icon d une bulle de message">
+											{% set count = 0 %}
+											<p>
+												{% for comment in article.comments %}
+													{% set count = count + 1 %}
+												{% endfor %}
+											</p>
+											<p>{{ count }}</p>
+										</div>
+										<div class="flex item-center gap5px like" data-id = {{ article.id }}>
+											{% if app.user in article.nbLike %}
+												<img src="{{asset('images/blog/heart-1.png')}}" alt="icon d un coeur">
+											{% else %}
+												<img src="{{asset('images/blog/heart.png')}}" alt="icon d un coeur">
+											{% endif %}
+											<p>{{ article.nbLike | length }}</p>
+										</div>
+									</div>
+									<div class="large-6 flex gap5px margin-top10px">
+										<div>
+											<a href="{{path('article_editer',{'id': article.id})}}" class="btn">Editer</a>
+										</div>
+										<div>
+											{% if article.publish != true %}
+												<a href="{{path('article_publish',{'id': article.id})}}" class="btn">Publier</a>
+											{% else %}
+												<a href="{{path('article_publish',{'id': article.id})}}" class="btn">Depublier</a>
+											{% endif %}
+										</div>
+										<div>
+											<a href="{{path('article_delete',{'id': article.id})}}" class="btn-delete">
+												<span class="color-white">Supprimer</span>
+											</a>
+										</div>
+									</div>
+								</div>
+							</article>
+						{% endfor %}
+					{% else %}
+						<p>Pas d'article non publié.</p>
+					{% endif %}
+
+				</div>
+			</section>
+			<!-- ARTICLE NON PUBLIÉ -->
+			<section class="article-user large-12 margin-top5">
+				<h2 class="margin-bottom10px">Mes articles non publiés</h2>
+				<div
+					class=" flex flex-wrap space-beween">
+					<!-- ARTICLE -->
+					{% if articlesNoPublish != null %}
+						{% for article in articlesNoPublish %}
+							<article class="large-6 flex margin-bottom5 padding10px">
+								<div class="padding-right10px large-6">
+									<div class="img"><img src="{{asset('/imgProduits/' ~ article.picture )}}" alt=""></div>
+								</div>
+								<div class="padding-left10px flex direction-column space-between large-6">
+									<div class="flex space-between">
+										<div class="category">
+											<p>{{ article.category.label }}</p>
+										</div>
+									</div>
+									<div>
+										<h2 class=" margin-bottom10px">{{ article.title }}</h2>
+										<p class=" ligth-grey">{{ article.auteur }}</p>
+										<p class="text-end ligth-grey margin-bottom10px">{{ article.creationDateAt | format_datetime('full','short',locale='fr')}}</p>
+									</div>
+									<div>
+										<p>{{ article.hat }}</p>
+									</div>
+									<div class="flex content-end">
+										<a class="flex item-center gap5px" href="{{path('app_detail',{id: article.id})}}">Lire suite
+											<img src="{{asset('images/blog/arrow-right.png')}}" alt="fleche a droite"></a>
+									</div>
+									<div class="flex item-center space-between large-5 gap16px">
+										<div class="flex item-center gap5px"><img src="{{asset('images/blog/message-circle.png')}}" alt="icon d une bulle de message">
+											{% set count = 0 %}
+											<p>
+												{% for comment in article.comments %}
+													{% set count = count + 1 %}
+												{% endfor %}
+											</p>
+											<p>{{ count }}</p>
+										</div>
+										<div class="flex item-center gap5px like " data-id = {{ article.id }}>
+											{% if app.user in article.nbLike %}
+												<img src="{{asset('images/blog/heart-1.png')}}" alt="icon d un coeur">
+											{% else %}
+												<img src="{{asset('images/blog/heart.png')}}" alt="icon d un coeur">
+											{% endif %}
+											<p>{{ article.nbLike | length }}</p>
+										</div>
+									</div>
+									<div class="large-6 flex gap5px margin-top10px">
+										<div>
+											<a href="{{path('article_editer',{'id': article.id})}}" class="btn">Editer</a>
+										</div>
+										<div>
+											{% if article.publish != true %}
+												<a href="{{path('article_publish',{'id': article.id})}}" class="btn">Publier</a>
+											{% else %}
+												<a href="{{path('article_publish',{'id': article.id})}}" class="btn">Depublier</a>
+											{% endif %}
+										</div>
+										<div>
+											<a href="{{path('article_delete',{'id': article.id})}}" class="btn-delete">
+												<span class="color-white">Supprimer</span>
+											</a>
+										</div>
+									</div>
+								</div>
+							</article>
+						{% endfor %}
+					{% else %}
+						<p>Pas d'article non publié.</p>
+					{% endif %}
+
+				</div>
+			</section>
+		</main>
+
+	{% endblock %}

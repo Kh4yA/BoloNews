@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register
+{% endblock %}
+{% block header %}
+	{% if is_granted("ROLE_ADMIN") %}
+		<a class="flex item-center gap5px category" href="{{path('app_admin')}}">Mon espace
+			<img src="{{asset('images/blog/user.png')}}" alt=""></a>
+		<a href="{{path('app_logout')}}">Me deconnecter</a>
+	{% elseif is_granted("ROLE_USER") %}
+		<a class="flex item-center gap5px category" href="{{path('app_user')}}">Mon espace
+			<img src="{{asset('images/blog/user.png')}}" alt="">
+			<a href="{{path('app_logout')}}">Me deconnecter</a>
+		{% else %}
+			<a href="{{path('app_login')}}">Se connecter</a>
+			<a href="{{path('app_register')}}" class="category">M'inscrire</a>
+		{% endif %}
+	{% endblock %}
+{% block body %}
+	<div class='form-creation flex direction-column item-center'>
+	<h1 class='margin-bottom10px'>Créer un compte</h1>
+	{{ form_errors(registrationForm) }}
+	{{ form_start(registrationForm) }}
+		{{ form_row(registrationForm.email) }}
+		{{ form_row(registrationForm.plainPassword, {
+            label: 'Mot de passe'
+        }) }}
+		{{ form_row(registrationForm.pseudo) }}
+		{{ form_row(registrationForm.agreeTerms) }}
+		<button type="submit" class="btn">Enregistrer</button>
+	{{ form_end(registrationForm) }}
+	</div>
+{% endblock %}

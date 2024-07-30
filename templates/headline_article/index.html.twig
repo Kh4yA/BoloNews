@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Article a la une{% endblock %}
+{% block headerNav %}
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#" >Articles</a><div class="underline"></div></li>
+                    <li><a href="#">Contact</a></li>
+{% endblock %}
+{% block header %}
+	{% if is_granted("ROLE_USER") %}
+		<a class="flex item-center gap5px" href="{{path('app_login')}}">Mon espace
+			<img src="{{asset('images/blog/user.png')}}" alt=""></a>
+		<a href="{{path('app_logout')}}">Me deconnecter</a>
+	{% else %}
+		<a href="{{path('app_login')}}">Se connecter</a>
+		<a href="{{path('app_register')}}">M'inscrire</a>
+	{% endif %}
+{% endblock %}
+{% block body %}
+
+{% endblock %}

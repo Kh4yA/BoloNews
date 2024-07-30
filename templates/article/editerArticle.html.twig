@@ -1,0 +1,69 @@
+{% extends "base.html.twig" %}
+{% block headerNav %}
+	<li>
+		<a href="{{path('app_app')}}">Home</a>
+
+	</li>
+	<li>
+		<a href="{{path('app_articles')}}">Articles</a>
+	</li>
+	<li>
+		<a href="#">Contact</a>
+	</li>
+{% endblock %}
+{% block header %}
+	{% if is_granted("ROLE_ADMIN") %}
+		<a class="flex item-center gap5px category" href="{{path('app_admin')}}">Mon espace
+			<img src="{{asset('images/blog/user.png')}}" alt=""></a>
+		<a href="{{path('app_logout')}}">Me deconnecter</a>
+	{% elseif is_granted("ROLE_USER") %}
+		<a class="flex item-center gap5px category" href="{{path('app_user')}}">Mon espace
+			<img src="{{asset('images/blog/user.png')}}" alt="">
+			<a href="{{path('app_logout')}}">Me deconnecter</a>
+		{% else %}
+			<a href="{{path('app_login')}}">Se connecter</a>
+			<a href="{{path('app_register')}}">M'inscrire</a>
+		{% endif %}
+	{% endblock %}
+
+	{% block body %}
+		{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+		<section class="form-article container-1200">
+			<div class=" margin-top5">
+            <div class='title large-12'>
+				{{ form_row(form.title) }}
+            </div>
+				<div class='flex space-between large-12 flex-wrap'>
+									<div class='large-6 text-area'>
+						{{ form_row(form.hat) }}
+					</div>
+
+					<div class='large-6 text-area'>
+						{{ form_row(form.content) }}
+					</div>
+                    <div class='large-12'>
+                    </div>
+                    <div class='picture large-6'>
+						{{ form_row(form.picture) }}
+						<div class="img-current">
+							<img src="{{'/imgProduits/' ~ article.picture }}" alt="">
+						</div>
+                    </div>
+                    <div class="categorie large-6">
+						{{ form_row(form.category) }}
+						{% if article.publish == 1 %}
+						<p>Votre article est pulié.</p>
+						{% elseif article.publish == 0 %}
+						Votre article n'est pas publié.
+						<label for="publish">Publier</label>
+						<input type="checkbox" name="publish" id="publish">
+						{% endif %}
+                    </div>
+                    <div class="save large-12 flex content-center margin-top5">
+						{{ form_row(form.Ajouter)}}
+                    </div>
+				</div>
+			</div>
+		</section>
+		{{ form_end(form) }}
+	{% endblock %}

@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bolonews
+{% endblock %}
+{% block headerNav %}
+	<li>
+		<a href="{{path('app_app')}}">Home</a>
+
+	</li>
+	<li>
+		<a href="{{path('app_articles')}}">Articles</a>
+	</li>
+	<li>
+		<a href="#">Contact</a>
+	</li>
+{% endblock %}
+{% block header %}
+	{% if is_granted("ROLE_ADMIN") %}
+		<a class="flex item-center gap5px category" href="{{path('app_admin')}}">Mon espace
+			<img src="{{asset('images/blog/user.png')}}" alt=""></a>
+		<a href="{{path('app_logout')}}">Me deconnecter</a>
+	{% elseif is_granted("ROLE_USER") %}
+		<a class="flex item-center gap5px category" href="{{path('app_app')}}">Mon espace
+			<img src="{{asset('images/blog/user.png')}}" alt="">
+			<a href="{{path('app_logout')}}">Me deconnecter</a>
+		{% else %}
+			<a href="{{path('app_login')}}">Se connecter</a>
+			<a href="{{path('app_register')}}">M'inscrire</a>
+		{% endif %}
+	{% endblock %}
+	{% block adminMenu %}
+		<div class="admin-menu large-2">
+			<nav>
+				<ul class="flex direction-column space-evenly gap16px">
+					<li>
+						<a href="{{path('app_admin')}}">
+							<span>Mes articles</span>
+						</a>
+					</li>
+					<li>
+						<a href="{{path('admin_allArticle')}}">
+							<span>Tous les articles</span>
+						</a>
+					</li>
+					<li>
+						<a href="{{path('admin_allUser')}}">
+							<span class="color-yellow">Users</span>
+						</a>
+					</li>
+					<li>
+						<a href="{{path('category_add')}}">
+							<span>Categories</span>
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	{% endblock %}
+
+	{% block body %}
+		<!-- A la Une  -->
+		<main
+			class="container-1200">
+			<!-- ARTICLE PUBLIÉ -->
+			<section class="list-user large-12 margin-top5">
+				<table>
+					<thead>
+						<th>Email</th>
+						<th>Role</th>
+						<th>Pseudo</th>
+						<th>Statut</th>
+						<th>Créer le</th>
+						<th>Authentifier</th>
+						<th>action</th>
+					</thead>
+					<tbody>
+						{% for user in users %}
+							<tr>
+								<td class='text-center'>{{ user.email }}</td>
+								<td class='text-center'>{{ user.roles | json_encode() }}</td>
+								<td class='text-center'>{{ user.pseudo }}</td>
+								<td class='text-center'>
+									{% if user.statut == 1 %}
+										<p>actif</p>
+									{% else %}
+										banni
+									{% endif %}
+								</td>
+								<td class='text-center'>{{ user.createdAt | format_datetime('full','short',locale='fr') }}</td>
+								<td class='text-center'>
+									{% if user.isVerified == 1 %}
+										<p>oui</p>
+									{% else %}
+										<p>non</p>
+									{% endif %}
+								</td>
+								<td class="flex space-evenly">
+									<a href="" class='btn-delete'>
+										<span class="color-white">Supprimer</span>
+									</a>
+									{% if user.statut == 1 %}
+									<a href="{{path('user_ban',{'id':user.id })}}" class='btn' class='btn'>Bannir</a>
+									{% else %}
+									<a href="{{path('user_ban',{'id':user.id })}}" class='btn' class='btn'>debannir</a>
+									{% endif %}
+									
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</section>
+		</main>
+	{% endblock %}
